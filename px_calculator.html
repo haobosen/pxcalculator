@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>图片尺寸缩放计算器</title>
+    <link rel="stylesheet" href="/static/common/css/common.css">
+</head>
+<style>
+    body {
+        -moz-user-select: none;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none !important;
+        margin: 0;
+    }
+
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+
+    .calculator {
+        padding-top: 20px;
+        padding-bottom: 20px;
+        padding-left: 20px;
+        margin: auto;
+    }
+
+    .input_container {
+        margin-bottom: 10px;
+        font-size: 0;
+    }
+
+    .standard_size {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    .input_container h2 {
+        margin-bottom: 10px;
+    }
+
+    .import_area {
+        margin-top: 10px;
+    }
+
+    .input_style {
+        width: 150px;
+        height: 30px;
+        border: 1px solid #e1e1e1;
+        margin-right: 10px;
+        padding: 0 5px;
+    }
+
+    .import_btn {
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        display: inline-block;
+        text-align: center;
+        line-height: 23px;
+        font-size: 18px;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .add_import {
+        background: #5cb85c;
+    }
+
+    .reduce_import {
+        background: #d9534f;
+    }
+
+    .results {
+        margin-left: 20px;
+        font-size: 14px;
+    }
+
+    .operation_btn {
+        width: 150px;
+        height: 30px;
+        color: #fff;
+        margin-top: 20px;
+        cursor: pointer;
+    }
+    #get_result {
+        border: 1px solid #5bc0de;
+        background: #5bc0de;
+    }
+    #clear_data{
+        border: 1px solid #f0ad4e;
+        background: #f0ad4e;
+    }
+</style>
+
+<body onselectstart="return false">
+    <div class="calculator">
+        <h1>图片尺寸缩放计算器</h1>
+        <div class="input_container standard_size">
+            <h2>标准：</h2>
+            <input class="input_style" id="standard_width" type="number" placeholder="标准宽度">
+            <input class="input_style" id="standard_height" type="number" placeholder="标准高度">
+        </div>
+
+        <div class="import_container">
+            <h2>请输入宽度或高度：</h2>
+            <div class="import_area">
+                <div class="input_container">
+                    <input class="input_style input_width" type="number" placeholder="宽度">
+                    <input class="input_style input_height" type="number" placeholder="高度">
+                    <span class="import_btn add_import">+</span>
+                    <span class="results"></span>
+                </div>
+                <!-- <div class="input_container">
+                    <input class="input_style input_width" type="text" placeholder="宽度">
+                    <input class="input_style input_height" type="text" placeholder="高度">
+                    <span class="import_btn reduce_import">-</span>
+                    <span class="results">1280 * 720</span>
+                </div> -->
+            </div>
+        </div>
+        <button class="operation_btn" id="get_result">计算</button>
+        <button class="operation_btn" id="clear_data">清空</button>
+    </div>
+</body>
+<script>
+
+    //增加输入框
+    var add = document.getElementsByClassName('add_import')[0];
+    add.onclick = function (e) {
+
+        var input_container = document.createElement('div');
+        input_container.className = 'input_container';
+
+        var inputW = document.createElement('input');
+        inputW.className = 'input_style input_width';
+        inputW.type = 'number';
+        inputW.placeholder = '宽度';
+
+        var inputH = document.createElement('input');
+        inputH.className = 'input_style input_height';
+        inputH.type = 'number';
+        inputH.placeholder = '高度';
+
+        var reduceBtn = document.createElement('span');
+        reduceBtn.className = 'import_btn reduce_import';
+        reduceBtn.textContent = '-';
+
+        var resultSpan = document.createElement('span');
+        resultSpan.className = 'results';
+
+        input_container.appendChild(inputW);
+        input_container.appendChild(inputH);
+
+        input_container.appendChild(reduceBtn);
+        input_container.appendChild(resultSpan);
+
+        document.getElementsByClassName('import_area')[0].appendChild(input_container);
+
+        reduceAddEvent();
+
+    }
+
+    //删除输入框
+    function reduceAddEvent() {
+        var reduce = document.getElementsByClassName('reduce_import');
+        var import_area = document.getElementsByClassName('import_area')[0];
+        for (var i = 0; i < reduce.length; i++) {
+            reduce[i].onclick = function () {
+                import_area.removeChild(this.parentNode);
+            }
+        }
+    }
+
+    //计算
+    var resultBtn = document.getElementById('get_result');
+    resultBtn.onclick = results;
+    document.onkeyup = function(e){
+        if(e.keyCode == 13){
+            results()
+        }
+    }
+    function results(){
+        var standard_width = document.getElementById('standard_width').value;
+            var standard_height = document.getElementById('standard_height').value;
+
+            var input_width_dom = document.getElementsByClassName('input_width');
+            var input_height_dom = document.getElementsByClassName('input_height');
+
+            var results = document.getElementsByClassName('results');
+
+            for (var i = 0; i < input_width_dom.length; i++) {
+
+                var input_width = input_width_dom[i].value;
+                var input_height = input_height_dom[i].value;
+            
+                if (standard_width == '' || standard_height == '') {
+                    alert('请输入标准宽高值');
+                } else {
+                    if (input_width == '') {
+                        results[i].innerHTML = parseInt(standard_width * input_height / standard_height) + ' * ' + parseInt(input_height);
+                    } else if (input_height == '') {
+                        results[i].innerHTML = parseInt(input_width) + ' * ' + parseInt(standard_height * input_width / standard_width);
+                    } else {
+                        alert('宽度和高度只能输入一个值');
+                    }
+
+                }
+
+            }
+    }
+
+    //清空
+    var clearBtn = document.getElementById('clear_data');
+
+    clearBtn.onclick = function(){
+
+        var input = document.getElementsByTagName('input');
+        var results = document.getElementsByClassName('results');
+
+        for(var i = 0; i < input.length; i++){
+            input[i].value = '';
+        }
+
+        for(var j = 0; j < results.length; j++){
+            results[j].innerHTML = '';
+        }
+
+       
+    }
+
+
+</script>
+
+</html>
